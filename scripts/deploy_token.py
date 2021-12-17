@@ -7,4 +7,3 @@ def main():
     foundation = accounts.load('foundation')
     MobixToken.deploy("Wrapped MOBIX", "wMOBX", 9, totalSupply, {'from': foundation}, publish_source=True) 
 
-
