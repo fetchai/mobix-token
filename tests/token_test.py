@@ -48,7 +48,9 @@ def test_approve(token, accounts):
 
 def test_approve_revoke(token, accounts):
     token.approve(accounts[1], amount, {'from': accounts[0]})
-    token.approve(accounts[1], 0, {'from': accounts[0]})
+    tx = token.approve(accounts[1], 0, {'from': accounts[0]})
+    assert tx.return_value == True
     assert token.allowance(accounts[0], accounts[1]) == 0
     with brownie.reverts():
-        token.transferFrom(accounts[0], accounts[2], 1, {'from': accounts[1]})
+        tx = token.transferFrom(accounts[0], accounts[2], 1, {'from': accounts[1]})
+        assert tx.return_value == False
