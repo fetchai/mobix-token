@@ -24,23 +24,20 @@ def test_initiation(token, accounts):
     assert token.symbol() == "MOBX"
 
 def test_transfer(token, accounts):
-    tx = token.transfer(accounts[1], amount, {'from': accounts[0]})
-    assert tx.return_value == True
+    assert token.transfer(accounts[1], amount, {'from': accounts[0]}).return_value
     assert token.balanceOf(accounts[1]) == amount
     assert token.balanceOf(accounts[0]) == totalSupply - amount
 
 def test_transfer_fail(token, accounts):
     with brownie.reverts():
-        tx = token.transfer(accounts[0], amount, {'from': accounts[1]})
+        token.transfer(accounts[0], amount, {'from': accounts[1]})
 
 def test_approve(token, accounts):
-    tx = token.approve(accounts[1], amount, {'from': accounts[0]})
-    assert tx.return_value == True
+    assert token.approve(accounts[1], amount, {'from': accounts[0]}).return_value
     assert token.allowance(accounts[0], accounts[1]) == amount
     with brownie.reverts():
-        tx = token.transferFrom(accounts[0], accounts[2], amount+1, {'from': accounts[1]})
-    tx = token.transferFrom(accounts[0], accounts[2], amount, {'from': accounts[1]})
-    assert tx.return_value == True
+        token.transferFrom(accounts[0], accounts[2], amount+1, {'from': accounts[1]})
+    assert token.transferFrom(accounts[0], accounts[2], amount, {'from': accounts[1]}).return_value
 
 def test_change_allowance(token, accounts):
     with brownie.reverts():
@@ -52,9 +49,8 @@ def test_change_allowance(token, accounts):
     assert token.allowance(accounts[0], accounts[1]) == amount-1
 
 def test_approve_revoke(token, accounts):
-    token.approve(accounts[1], amount, {'from': accounts[0]})
-    tx = token.approve(accounts[1], 0, {'from': accounts[0]})
-    assert tx.return_value == True
+    assert token.approve(accounts[1], amount, {'from': accounts[0]}).return_value
+    assert token.approve(accounts[1], 0, {'from': accounts[0]}).return_value
     assert token.allowance(accounts[0], accounts[1]) == 0
     with brownie.reverts():
-        tx = token.transferFrom(accounts[0], accounts[2], 1, {'from': accounts[1]})
+        token.transferFrom(accounts[0], accounts[2], 1, {'from': accounts[1]})
