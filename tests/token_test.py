@@ -25,33 +25,26 @@ def test_initiation(token, accounts):
     assert token.symbol() == "MBX"
 
 def test_transfer(token, accounts):
-    token.transfer(accounts[1], amount, {'from': accounts[0]})
+    tx = token.transfer(accounts[1], amount, {'from': accounts[0]})
+    assert tx.return_value == True
     assert token.balanceOf(accounts[1]) == amount
     assert token.balanceOf(accounts[0]) == totalSupply - amount
 
-def test_approve(token, accounts):
-    token.approve(accounts[1], amount, {'from': accounts[0]})
-    assert token.allowance(accounts[0], accounts[1]) == amount
-    with brownie.reverts():
-        token.transferFrom(accounts[0], accounts[2], amount+1, {'from': accounts[1]})
-    token.transferFrom(accounts[0], accounts[2], amount, {'from': accounts[1]})
-
-
 def test_transfer_fail(token, accounts):
     with brownie.reverts():
-        token.transfer(accounts[0], amount, {'from': accounts[1]})
-
-
-def test_fail_approve(token, accounts):
-    with brownie.reverts():
-        token.transferFrom(accounts[1], accounts[2], amount, {'from': accounts[0]})
-
+        tx = token.transfer(accounts[0], amount, {'from': accounts[1]})
+        assert tx.return_value == False
 
 def test_approve(token, accounts):
-    token.approve(accounts[1], amount, {'from': accounts[0]})
+    tx = token.approve(accounts[1], amount, {'from': accounts[0]})
+    assert tx.return_value == True
+    assert token.allowance(accounts[0], accounts[1]) == amount
     with brownie.reverts():
-        token.transferFrom(accounts[0], accounts[2], amount+1, {'from': accounts[1]})
-    token.transferFrom(accounts[0], accounts[2], amount, {'from': accounts[1]})
+        tx = token.transferFrom(accounts[0], accounts[2], amount+1, {'from': accounts[1]})
+        assert tx.return_value == False
+    tx = token.transferFrom(accounts[0], accounts[2], amount, {'from': accounts[1]})
+    assert tx.return_value == True
+
 
 def test_approve_revoke(token, accounts):
     token.approve(accounts[1], amount, {'from': accounts[0]})
